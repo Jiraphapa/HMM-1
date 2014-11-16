@@ -51,14 +51,52 @@ class HMM(Classifier):
                 for n in range(State_num):
                     forward[i]+=forward_old[n]*self.HmmModel.transition_probabilities[n][i]*self.HmmModel.emission_probabilities[i][ob]
             forward_old=forward
+            forward=[0 for count in range(State_num)]
         #get final transition
         for i in range(State_num):
             score+=forward_old[i]*self.HmmModel.final_transition_probabilities[i]     
         return score
-    def classify(self,test_sentence):
-        '''Using Viterbe algorithm to tag the state of the observed array,return a state array'''
-        state=[]
-        return state
+    def classify(self,Document,Test=False,T=0):
+        '''Using viterbi algorithm to tag the state of the observed array,return a state array'''
+        final_score=0
+        back_trace_final=0
+        path=[]
+        observed_array=Document.features()
+        Time=len(observed_array)
+        State_num=len(self.HmmModel.states)
+        back_matrix=[ [0 for n in range(State_num)] for i in range(Time)]#to record to back trace path
+        vertibi=[0]*State_num
+        vertibi_old=[0]*State_num
+        ob=self.HmmModel.vocabularybook.get(observed_array[0])
+        for i in range(State_num):
+            vertibi_old[i]=self.HmmModel.initial_probabilities[i]*self.HmmModel.emission_probabilities[i][ob]
+            back_matrix[0][i]=-1
+        for time in range(1,Time):
+            ob=self.HmmModel.vocabularybook.get(observed_array[time])
+            for i in range(State_num):
+                for n in range(State_num):
+                    if vertibi_old[n]*self.HmmModel.transition_probabilities[n][i]*self.HmmModel.emission_probabilities[i][ob]>vertibi[i]:
+                        vertibi[i]=vertibi_old[n]*self.HmmModel.transition_probabilities[n][i]*self.HmmModel.emission_probabilities[i][ob]
+                        back_matrix[time][i]=n
+            
+            vertibi_old=vertibi
+            vertibi=[0 for count in range(State_num)]
+            if Test==True and time==T:#output the test result
+                return vertibi_old
+        #get the final transition
+        for i in range(State_num):
+            if vertibi_old[i]*self.HmmModel.final_transition_probabilities[i]>final_score:
+                final_score=vertibi_old[i]*self.HmmModel.final_transition_probabilities[i]
+                back_trace_final=i
+        #Making the path
+        uper_layer=back_trace_final
+        state=self.HmmModel.statesbook.name(uper_layer)
+        path.append(state);
+        for time in range(Time-1,0,-1):
+            uper_layer=back_matrix[time][uper_layer]
+            state=self.HmmModel.statesbook.name(uper_layer)
+            path.append(state);
+        return path
   
 
 

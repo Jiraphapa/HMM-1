@@ -44,6 +44,9 @@ class IceCreamHMM(TestCase):
         # The same error occurs in Figure 6.10, but the value given for the
         # Viterbi variable v_2(2) is .0448, which is correct (as you should
         # verify manually and perhaps add a test for here).
+        self.assertAlmostEqual(self.hmm.classify(IceCreamCones([3, 1, 3]),Test=True,T=1)[0], max(.32*.14,.02*.08))
+        self.assertAlmostEqual(self.hmm.classify(IceCreamCones([3, 1, 3]),Test=True,T=1)[1], max(.32*.15,.02*.30))
+        #Test the value at time step 2
         self.assertEqual(self.hmm.classify(IceCreamCones([3, 1, 3])),
                          ["Hot", "Hot", "Hot"])
 
