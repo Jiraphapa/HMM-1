@@ -5,7 +5,7 @@ from __future__ import division
 from corpus import Document
 from hmm import HMM
 
-from nltk.corpus import treebank as tagged_corpus # could also use brown, etc.
+from nltk.corpus import brown as tagged_corpus # could also use brown, etc.
 
 import sys
 from unittest import TestCase, main, skip
@@ -24,8 +24,8 @@ class IceCreamHMM(TestCase):
         # of initializing them.
         self.hmm.train([],
                        initial_probabilities=[.8, .2], # P(Hot, Cold)
-                       transition_probabilities=[[.7, .3],  # P(Hot|Hot, Cold)
-                                                 [.4, .6]], # P(Cold|Hot, Cold)
+                       transition_probabilities=[[.7, .3],  # P(Hot, Cold|Hot)
+                                                 [.4, .6]], # P(Hot, Cold|Cold)
                        emission_probabilities=[[.2, .4, .4],  # P(1, 2, 3|Hot)
                                                [.5, .4, .1]], # P(1, 2, 3|Cold)
                        states=("Hot", "Cold"),
